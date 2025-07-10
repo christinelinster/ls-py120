@@ -195,20 +195,29 @@ class TTTGame:
         self.board.mark_squares_at(choice, self.human.marker)
 
     def computer_moves(self):
-        valid_choices = self.board.unused_squares()
         choice = self.offensive_move()
 
         if not choice:
             choice = self.defensive_move()
 
         if not choice:
-            choice = random.choice(valid_choices)
+            choice = self.pick_center_square()
+        
+        if not choice:
+            choice = self.pick_random_square()
 
         # Need to make sure it is empty first
         self.board.mark_squares_at(choice, self.computer.marker)
 
     def three_in_a_row(self, player, row):
         return self.board.count_markers_for(player, row) == 3
+    
+    def pick_center_square(self):
+        return 5 if self.board.is_unused_square(5) else None
+    
+    def pick_random_square(self):
+        valid_choices = self.board.unused_squares()
+        return random.choice(valid_choices)
     
     def defensive_move(self):
         for row in TTTGame.POSSIBLE_WINNING_ROWS:
