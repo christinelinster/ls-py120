@@ -80,6 +80,7 @@ class Board:
 class Player:
     def __init__(self, marker):
         self.marker = marker
+        self.points = 0
 
     @property
     def marker(self):
@@ -88,6 +89,8 @@ class Player:
     @marker.setter
     def marker(self, value):
         self._marker = value
+
+    
 
 class Human(Player):
     def __init__(self):
@@ -99,7 +102,7 @@ class Computer(Player):
         super().__init__(Square.COMPUTER_MARKER)
 
 class TTTGame:
-
+    WINS_NEEDED = 3
     POSSIBLE_WINNING_ROWS = (
         (1, 2, 3),
         (4, 5, 6),
@@ -120,12 +123,21 @@ class TTTGame:
         self.board.display()
         
         while True:
+            self.display_match_points()
             self.play_one_game()
-            if not self.play_again():
+            self.add_point()
+            if self.match_won():
+                self.display_match_points()
+                self.display_match_winner()
                 break
             else:
+                input("Press enter for the next round: ")
                 self.reset_game()
-            
+
+            # if not self.play_again():
+            #     break
+            # else:
+            #     self.reset_game()
         self.display_goodbye_message()
     
     def play_one_game(self):
@@ -138,7 +150,7 @@ class TTTGame:
                 if self.is_game_over():
                     break
 
-                self.board.display()
+                self.board.display_with_clear()
 
         self.board.display_with_clear()
         self.display_results()
@@ -157,7 +169,6 @@ class TTTGame:
     def reset_game(self):
         self.board.reset()
         self.board.display_with_clear()
-        
 
     def display_welcome_message(self):
         clear_screen()
@@ -170,6 +181,9 @@ class TTTGame:
     @staticmethod
     def _join_or(choices, delimiter=', ', conjunction='or'):
         prompt = [str(choice) for choice in choices]
+        if not prompt:
+            return ''
+        
         if len(prompt) == 1:
             return prompt[0]
         
@@ -246,6 +260,25 @@ class TTTGame:
             if self.three_in_a_row(player, row):
                 return True
         return False
+    
+    def add_point(self):
+        if self.is_winner(self.human):
+            self.human.points += 1
+        elif self.is_winner(self.computer):
+            self.computer.points += 1
+
+    def match_won(self):
+        return self.human.points == TTTGame.WINS_NEEDED or self.computer.points == TTTGame.WINS_NEEDED
+    
+    def display_match_points(self):
+        print(f"\nHuman points: {self.human.points}")
+        print(f"Computer points: {self.computer.points}")
+    
+    def display_match_winner(self):
+        if self.human.points == TTTGame.WINS_NEEDED:
+            print("\nYou won this match! Congratulations!")
+        elif self.computer.points == TTTGame.WINS_NEEDED:
+            print("\nI won this match. You lose!")
 
     def display_results(self):
         if self.is_winner(self.human):
