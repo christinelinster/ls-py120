@@ -3,6 +3,13 @@
 class WalkMixin:
     def walk(self):
         return f"{self} {self.gait()} forward"
+    
+class Animal:
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+       return self.name
 
 class Noble(WalkMixin):
     def __init__(self, name, title):
@@ -15,36 +22,27 @@ class Noble(WalkMixin):
     def __str__(self):
         return f"{self.title} {self.name}"
 
-class Person(WalkMixin):
+class Person(WalkMixin, Animal):
     def __init__(self, name):
-        self.name = name
+        super().__init__(name)
 
     def gait(self):
         return "strolls"
     
-    def __str__(self):
-       return self.name
-
-class Cat(WalkMixin):
+    
+class Cat(WalkMixin, Animal):
     def __init__(self, name):
-        self.name = name
+        super().__init__(name)
 
     def gait(self):
         return "saunters"
-    
-    def __str__(self):
-        return self.name
 
-class Cheetah(WalkMixin):
+class Cheetah(WalkMixin, Animal):
     def __init__(self, name):
-        self.name = name
+        super().__init__(name)
 
     def gait(self):
         return "runs"
-    
-    def __str__(self):
-        return self.name
-
 
 byron = Noble("Byron", "Lord")
 print(byron.walk())  # "Lord Byron struts forward"

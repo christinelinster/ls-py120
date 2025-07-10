@@ -1,4 +1,4 @@
-# Pet Shelter, REVIEW, FURTHER EXPLORATION
+# Pet Shelter
 
 class Pet:
     def __init__(self, animal, name):
@@ -27,11 +27,24 @@ class Owner:
 class Shelter:
     def __init__(self):
         self.owners = {}
+        self.unadopted_pets = []
+
+    def add(self, pet):
+        self.unadopted_pets.append(pet)
 
     def adopt(self, owner, pet):
-        owner.add_pet(pet)
-        if owner.name not in self.owners:
-            self.owners[owner.name] = owner
+        if pet in self.unadopted_pets:
+            owner.add_pet(pet)
+            self.unadopted_pets.remove(pet)
+            if owner.name not in self.owners:
+                self.owners[owner.name] = owner
+        else:
+            print("That pet is not available for adoption!")
+
+    def print_unadopted_pets(self):
+        print("The Animal Shelter has the following unadopted pets: ")
+        for pet in self.unadopted_pets:
+            print(pet.info())
 
     def print_adoptions(self):
         for name, owner in self.owners.items():
@@ -39,7 +52,7 @@ class Shelter:
             owner.print_pets()
             print("")
             
-
+shelter = Shelter()
 
 cocoa   = Pet('cat', 'Cocoa')
 cheddar = Pet('cat', 'Cheddar')
@@ -48,11 +61,19 @@ kennedy = Pet('dog', 'Kennedy')
 sweetie = Pet('parakeet', 'Sweetie Pie')
 molly   = Pet('dog', 'Molly')
 chester = Pet('fish', 'Chester')
+free = Pet('dog', 'Free')
+
+shelter.add(cocoa)
+shelter.add(cheddar)
+shelter.add(darwin)
+shelter.add(kennedy)
+shelter.add(sweetie)
+shelter.add(molly)
+shelter.add(chester)
 
 phanson = Owner('P Hanson')
 bholmes = Owner('B Holmes')
 
-shelter = Shelter()
 shelter.adopt(phanson, cocoa)
 shelter.adopt(phanson, cheddar)
 shelter.adopt(phanson, darwin)
@@ -60,7 +81,9 @@ shelter.adopt(bholmes, kennedy)
 shelter.adopt(bholmes, sweetie)
 shelter.adopt(bholmes, molly)
 shelter.adopt(bholmes, chester)
+shelter.adopt(phanson, free)
 
+shelter.print_unadopted_pets()
 shelter.print_adoptions()
 print(f"{phanson.name} has {phanson.number_of_pets()} "
       "adopted pets.")
