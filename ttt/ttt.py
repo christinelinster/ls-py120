@@ -135,14 +135,22 @@ class TTTGame:
 
     def display_goodbye_message(self):
         print("Thanks for playing Tic Tac Toe! Goodbye!")
+    
+    @staticmethod
+    def _join_or(choices, delimiter=', ', conjunction='or'):
+        prompt = [str(choice) for choice in choices]
+        if len(prompt) == 1:
+            return prompt[0]
+        
+        if len(prompt) == 2:
+            return f"{prompt[0]} {conjunction} {prompt[1]}"
+        return f"{delimiter.join(prompt[:-1])} {conjunction} {prompt[-1]}"
 
     def human_moves(self):
         choice = None
         while True:
             valid_choices = self.board.unused_squares()
-            prompt = f"Choose a square ({', '.join(str(choice)
-                                                   for choice
-                                                   in valid_choices)}): "
+            prompt = f"Choose a square ({self._join_or(valid_choices, ';', 'now')}): "
             choice = input(prompt)
             try:
                 choice = int(choice)
