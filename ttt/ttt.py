@@ -34,9 +34,8 @@ class Board:
         self.squares = {key: Square() for key in range(1,10)}
 
     def unused_squares(self):
-        return [key for key, square
-                in self.squares.items()
-                if square.is_unused()]
+        return [key for key
+                in self.squares.keys() if self.is_unused_square(key)]
     
     def is_unused_square(self, key):
         return self.squares[key].is_unused()
@@ -197,10 +196,14 @@ class TTTGame:
 
     def computer_moves(self):
         valid_choices = self.board.unused_squares()
-        
-        choice = self.defensive_move()
+        choice = self.offensive_move()
+
+        if not choice:
+            choice = self.defensive_move()
+
         if not choice:
             choice = random.choice(valid_choices)
+
         # Need to make sure it is empty first
         self.board.mark_squares_at(choice, self.computer.marker)
 
@@ -213,13 +216,31 @@ class TTTGame:
             if key:
                 return key
         return None
+    
+    def offensive_move(self):
+        for row in TTTGame.POSSIBLE_WINNING_ROWS:
+            key = self.winning_square(row)
+            if key:
+                return key
+        return None
+    
+    def two_in_a_row(self, player, row):
+        return self.board.count_markers_for(player, row) == 2
 
     def at_risk_square(self, row):
-        if self.board.count_markers_for(self.human, row) == 2:
+        if self.two_in_a_row(self.human, row):
             for key in row:
                 if self.board.is_unused_square(key):
                     return key
         return None
+    
+    def winning_square(self, row):
+        if self.two_in_a_row(self.computer, row):
+            for key in row:
+                if self.board.is_unused_square(key):
+                    return key
+        return None
+
 
     def is_winner(self, player):
         for row in TTTGame.POSSIBLE_WINNING_ROWS:
