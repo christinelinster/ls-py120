@@ -28,12 +28,18 @@ class Square:
 
 class Board:
     def __init__(self):
+        self.reset()
+
+    def reset(self):
         self.squares = {key: Square() for key in range(1,10)}
 
     def unused_squares(self):
         return [key for key, square
                 in self.squares.items()
                 if square.is_unused()]
+    
+    def is_unused_square(self, key):
+        return self.squares[key].is_unused()
 
     def is_full(self):
         return len(self.unused_squares()) == 0
@@ -113,20 +119,46 @@ class TTTGame:
     def play(self):
         self.display_welcome_message()
         self.board.display()
-
+        
         while True:
-            self.human_moves()
-            if self.is_game_over():
+            self.play_one_game()
+            if not self.play_again():
                 break
+            else:
+                self.reset_game()
+            
+        self.display_goodbye_message()
+    
+    def play_one_game(self):
+        while True:
+                self.human_moves()
+                if self.is_game_over():
+                    break
 
-            self.computer_moves()
-            if self.is_game_over():
-                break
-            self.board.display_with_clear()
+                self.computer_moves()
+                if self.is_game_over():
+                    break
+
+                self.board.display()
 
         self.board.display_with_clear()
         self.display_results()
-        self.display_goodbye_message()
+
+
+    def play_again(self):
+        while True:
+            answer = input("Do you want to play again? (y/n): ").lower()
+            if answer in ("y", "yes", "n", "no"):
+                break
+                
+            print("Sorry, that's not a valid choice.")
+        clear_screen()
+        return answer in ("y", "yes")
+
+    def reset_game(self):
+        self.board.reset()
+        self.board.display_with_clear()
+        
 
     def display_welcome_message(self):
         clear_screen()
@@ -150,7 +182,7 @@ class TTTGame:
         choice = None
         while True:
             valid_choices = self.board.unused_squares()
-            prompt = f"Choose a square ({self._join_or(valid_choices, ';', 'now')}): "
+            prompt = f"Choose a square ({self._join_or(valid_choices)}): "
             choice = input(prompt)
             try:
                 choice = int(choice)
@@ -165,12 +197,29 @@ class TTTGame:
 
     def computer_moves(self):
         valid_choices = self.board.unused_squares()
-        choice = random.choice(valid_choices)
+        
+        choice = self.defensive_move()
+        if not choice:
+            choice = random.choice(valid_choices)
         # Need to make sure it is empty first
         self.board.mark_squares_at(choice, self.computer.marker)
 
     def three_in_a_row(self, player, row):
         return self.board.count_markers_for(player, row) == 3
+    
+    def defensive_move(self):
+        for row in TTTGame.POSSIBLE_WINNING_ROWS:
+            key = self.at_risk_square(row)
+            if key:
+                return key
+        return None
+
+    def at_risk_square(self, row):
+        if self.board.count_markers_for(self.human, row) == 2:
+            for key in row:
+                if self.board.is_unused_square(key):
+                    return key
+        return None
 
     def is_winner(self, player):
         for row in TTTGame.POSSIBLE_WINNING_ROWS:
