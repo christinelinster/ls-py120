@@ -23,15 +23,14 @@ class Deck:
     SUITS = ['Hearts', 'Clubs', 'Diamonds', 'Spades']
     def __init__(self):
         self.get_new_deck()
-        # STUB
-        # What attributes does a deck need? A collection of 52 cards? 
-        # Some data structure like list or dictionary might be required
 
     def get_new_deck(self):
         self._deck = [Card(rank, suit) for suit in Deck.SUITS for rank in Deck.RANKS]
         random.shuffle(self._deck)
 
     def deal(self):
+        if not self._deck:
+            self.get_new_deck()
         return self._deck.pop()
 
 class Participant:
@@ -88,15 +87,40 @@ class Dealer(Participant):
 
 class TwentyOneGame:
     NO_DEALER_HIT = 17
+    MIN_BALANCE = 4
+    MAX_BALANCE = 6
     def __init__(self):
         self.player = Player()
         self.dealer = Dealer()
         self.deck = Deck()
 
     def start(self):
+        clear_screen()
         self.display_welcome_message()
-        self.deal_cards()
+        self.display_player_balance()
+        
+        while True:
+            if TwentyOneGame.MIN_BALANCE < self.get_player_balance() < TwentyOneGame.MAX_BALANCE:
 
+                self.play_one_round()
+                self.display_player_balance()
+                
+                if self.play_again():
+                    clear_screen()
+                    self.reset_game()
+                else:
+                    break
+            elif self.get_player_balance() == TwentyOneGame.MIN_BALANCE:
+                print("Sorry! You do not have enough balance to keep playing!")
+                break
+            elif self.get_player_balance() == TwentyOneGame.MAX_BALANCE:
+                print("Sorry! You have reached the maximum balance allowed.")
+                break
+                
+        self.display_goodbye_message()
+
+    def play_one_round(self):
+        self.deal_cards()
         self.show_cards()
         self.show_dealer_cards()
 
@@ -108,10 +132,24 @@ class TwentyOneGame:
         else:
             self.dealer_turn()
             self.display_result()
-
+        self.update_player_balance()
         
-        self.display_goodbye_message()
 
+
+    def play_again(self):
+        while True:
+            answer = input(f"Do you want to play again?(y/n): ").lower()
+            if answer in ("y", "yes", "n", "no"):
+                break
+            print("Please enter a valid input.")
+
+        return answer.startswith("y")
+
+    def reset_game(self):
+        self.player.hand = []
+        self.dealer.hand = []
+        self.dealer.reveal = False
+        
     def deal_cards(self):
         for _ in range(2):
             self.player.hit(self.deck.deal())
@@ -145,6 +183,7 @@ class TwentyOneGame:
             self.show_value(self.player)
             prompt = "Hit or stay? (h/s): "
             choice = input(prompt).lower()
+            clear_screen()
 
             if choice.startswith("h"):
                 print("You chose to hit!")
@@ -177,21 +216,46 @@ class TwentyOneGame:
     def display_goodbye_message(self):
         print("\nThank you for playing the Twenty One Game. Goodbye!")
 
-    def display_result(self):
-        if self.player.is_busted():
-            print("\nYou busted! You lose!")
-        elif self.dealer.is_busted():
-            print("\nDealer busted! You win!")
+    GAME_RESULTS = {"Dealer": "Dealer wins!", "Player": "Player wins!", "Tie": "Tie game!"}
+    
+    def get_winner(self):
+        dealer_value = self.dealer.get_hand_value()
+        player_value = self.player.get_hand_value()
+
+        if self.dealer.is_busted():
+            return "Player"
+        elif self.player.is_busted():
+            return "Dealer"
         else:
-            dealer_value = self.dealer.get_hand_value()
-            player_value = self.player.get_hand_value()
             if dealer_value > player_value:
-                print("\nDealer wins!")
+                return "Dealer"
             elif player_value > dealer_value:
-                print("\nYou win!")
+                return "Player"
             else:
-                print("\nTie game!")
+                return "Tie"
         
+    def display_player_balance(self):
+        print(f"Your current balance is: {self.get_player_balance()}")
+
+    def update_player_balance(self):
+        if self.get_winner() == "Dealer":
+            self.player.balance -= 1
+        elif self.get_winner() == "Player":
+            self.player.balance += 1
+
+    def get_player_balance(self):
+        return self.player.balance
+
+    def display_result(self):
+        clear_screen()
+        if self.player.is_busted():
+            print("You busted! You lose!\n")
+        elif self.dealer.is_busted():
+            print("Dealer busted! You win!\n")
+        else:
+            winner = self.get_winner()
+            print(f"{self.GAME_RESULTS[winner]}\n")
+
         self.show_value(self.player)
         self.show_cards()
 
