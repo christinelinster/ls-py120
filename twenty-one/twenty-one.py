@@ -51,7 +51,7 @@ class Participant:
                 total += card.value()
 
         for _ in range(aces):
-            if total + 11 < 21:
+            if total + 11 <= 21:
                 total += 11
             else:
                 total += 1
@@ -87,8 +87,8 @@ class Dealer(Participant):
 
 class TwentyOneGame:
     NO_DEALER_HIT = 17
-    MIN_BALANCE = 4
-    MAX_BALANCE = 6
+    MIN_BALANCE = 1
+    MAX_BALANCE = 9
     def __init__(self):
         self.player = Player()
         self.dealer = Dealer()
@@ -99,24 +99,17 @@ class TwentyOneGame:
         self.display_welcome_message()
         self.display_player_balance()
         
-        while True:
-            if TwentyOneGame.MIN_BALANCE < self.get_player_balance() < TwentyOneGame.MAX_BALANCE:
+        while not self.is_game_over():
+            self.play_one_round()
+            self.display_player_balance()
+            if not self.play_again():
+                break
+            clear_screen()
+            self.reset_game()
 
-                self.play_one_round()
-                self.display_player_balance()
-                
-                if self.play_again():
-                    clear_screen()
-                    self.reset_game()
-                else:
-                    break
-            elif self.get_player_balance() == TwentyOneGame.MIN_BALANCE:
-                print("Sorry! You do not have enough balance to keep playing!")
-                break
-            elif self.get_player_balance() == TwentyOneGame.MAX_BALANCE:
-                print("Sorry! You have reached the maximum balance allowed.")
-                break
-                
+        if self.is_game_over():
+            self.display_game_over_message()
+
         self.display_goodbye_message()
 
     def play_one_round(self):
@@ -127,15 +120,23 @@ class TwentyOneGame:
         self.play_turn()
         self.dealer.reveal = True
 
-        if self.player.is_busted():
-            self.display_result()
-        else:
+        if not self.player.is_busted():
             self.dealer_turn()
-            self.display_result()
-        self.update_player_balance()
         
+        self.display_result()
+        self.update_player_balance()
 
-
+    def is_game_over(self):
+        if TwentyOneGame.MIN_BALANCE <= self.get_player_balance() <= TwentyOneGame.MAX_BALANCE:
+            return False
+        return True
+    
+    def display_game_over_message(self):
+        if self.get_player_balance() < TwentyOneGame.MIN_BALANCE:
+            print("Sorry, you're broke!")
+        elif self.get_player_balance > TwentyOneGame.MAX_BALANCE:
+            print("You're too rich!")
+        
     def play_again(self):
         while True:
             answer = input(f"Do you want to play again?(y/n): ").lower()
@@ -200,15 +201,13 @@ class TwentyOneGame:
                 print("That's not a valid choice.\n")
 
     def dealer_turn(self):
+        input("Press enter when you're ready for the dealer: ")
         while True: 
-            if self.dealer.get_hand_value() < TwentyOneGame.NO_DEALER_HIT:
+            if self.dealer.get_hand_value() >= TwentyOneGame.NO_DEALER_HIT or self.dealer.is_busted():
+                break
+            else:
                 card = self.deck.deal()
                 self.dealer.hit(card)
-            else:
-                break
-            
-            if self.dealer.is_busted():
-                break
 
     def display_welcome_message(self):
         print("Welcome to the Twenty One Game!\n")
