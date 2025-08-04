@@ -1,15 +1,14 @@
-class FueledVehicleMixIn:
-    def set_fuel_efficiency(self, kilometers_per_liter):
-        self.fuel_efficiency = kilometers_per_liter
+class FuelMixin:
+    def set_fuel_efficiency(self, km_per_litre):
+        self.fuel_efficiency = km_per_litre
     
-    def set_fuel_capacity(self, liters):
-        self.fuel_capacity = liters
+    def set_fuel_capacity(self, litres):
+        self.fuel_capacity = litres
 
     def range(self):
-        return self.fuel_capacity * self.fuel_efficiency
-    
+        return self.fuel_efficiency * self.fuel_capacity
 
-class WheeledVehicle(FueledVehicleMixIn):
+class WheeledVehicle(FuelMixin):
     def __init__(self,
                  tire_list,
                  kilometers_per_liter,
@@ -34,7 +33,7 @@ class Motorcycle(WheeledVehicle):
         # 2 tires with various tire pressures
         super().__init__([20, 20], 80, 8.0)
 
-class Catamaran(FueledVehicleMixIn):
+class Catamaran(FuelMixin):
     def __init__(self,
                 number_propellers,
                 number_hulls,
@@ -44,7 +43,6 @@ class Catamaran(FueledVehicleMixIn):
         self.number_hulls = number_hulls
         self.set_fuel_efficiency(kilometers_per_liter)
         self.set_fuel_capacity(liters_of_fuel_capacity)
-        # ... code omitted ...
 
 auto = Auto()
 motorcycle = Motorcycle()
