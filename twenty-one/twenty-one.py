@@ -58,9 +58,7 @@ class Participant:
         return total
     
     def is_busted(self):
-        if self.get_hand_value() > Participant.BUST_VALUE:
-            return True
-        return False
+        return self.get_hand_value() > Participant.BUST_VALUE
     
     def __str__(self):
         return self.__class__.__name__
