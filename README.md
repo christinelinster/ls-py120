@@ -31,17 +31,17 @@ A comprehensive deep dive into the Object-Oriented Programming (OOP) paradigm wi
 
 ## Projects
 
-### OO Rock Paper Scissors
+### [OO Rock Paper Scissors](./rps)
 A refactoring of the classic procedural game into an Object-Oriented design.
 * **Focus:** Introduction to classes, modeling `Player` and `Move` objects, and basic inheritance structures.
 * **Features:** Game history tracking, customizable rules, and computer personalities.
 
-### OO Tic Tac Toe
+### [OO Tic Tac Toe](./ttt)
 An intermediate implementation requiring strict separation of concerns between the display logic and game engine.
 * **Focus:** Collaborator objects (`Board`, `Square`, `Player`), managing complex game state, and building an extensible AI.
 * **Features:** Scalable board size and intelligent computer defense/offense.
 
-### OO Twenty-One (Blackjack)
+### [OO Twenty-One (Blackjack)](./twenty-one)
 A complex simulation of the card game involving dealer logic, variable ace values, and bankroll management.
 * **Focus:** Deep polymorphism (treating `Player` and `Dealer` similarly via a common superclass), specialized containers (Deck/Hand), and flow control.
 
@@ -49,8 +49,25 @@ A complex simulation of the card game involving dealer logic, variable ace value
 
 ```text
 ls-py120/
-├── lesson_1/              # OO Readings & Fundamentals (Classes, Objects)
-├── lesson_2/              # Inheritance, Polymorphism & RPS Project
-├── lesson_3/              # Variable Scope, Exceptions, and Custom Operators
-├── lesson_4/              # Practice Problems (Easy, Medium, Hard)
-└── lesson_5/              # Slightly Larger OO Programs (Tic Tac Toe, Twenty-One)
+├── oo_readings/           # Core readings and introductory concepts
+├── practice_snippets/     # Small code snippets for testing understanding
+├── problem_sets/          # Sets of problems focusing on specific OOP topics
+├── oo_basics1/            # Drills: Classes and Objects
+├── oo_basics2/            # Drills: Accessor methods and scope
+├── oo_basics3/            # Drills: Inheritance and variable scope
+├── rps/                   # Project: OO Rock Paper Scissors
+├── easy_exercises/        # Practice Problems: Easy difficulty
+├── med_exercises/         # Practice Problems: Intermediate difficulty
+├── practice_problems/     # Additional OOP drills and exam prep
+├── ttt/                   # Project: OO Tic Tac Toe
+└── twenty-one/            # Project: OO Twenty-One****
+```
+
+## Key Takeaways
+* Mastery of Python's Object-Oriented syntax and idioms.
+* Ability to architect complex programs using Composition and Inheritance.
+* Skill in reading and debugging complex, multi-class codebases.
+* Understanding of design patterns and how to organize code for maintainability.
+
+## License
+MIT
